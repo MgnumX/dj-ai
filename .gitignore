@@ -1,0 +1,35 @@
+# Local audio, analysis cache and exports
+/songs/
+/cache/
+/output/
+*.mp3
+*.flac
+*.wav
+*.m4a
+*.ogg
+*.opus
+*.webm
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local dependencies and credentials
+node_modules/
+.env
+.env.*
+config.json
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+
+# Ingestion helpers are outside this public analysis/planning repository
+/djdl.py
+/dj-etiquetar.py
+/README-djdl.md
