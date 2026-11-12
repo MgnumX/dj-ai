@@ -17,6 +17,8 @@ python main.py --songs /ruta/a/tu/audio --cache ./cache --output ./output --coun
 
 El pipeline analiza BPM, tonalidad y energía; ordena los tracks, corta segmentos y escribe la mezcla en `output/`. Los audios, cachés y resultados se mantienen locales.
 
+Mezcla verificada con datos sintéticos; prueba con audio real pendiente.
+
 ## Ejemplo de salida
 
 Salida capturada del planificador con metadatos sintéticos de prueba (sin archivos de audio):
