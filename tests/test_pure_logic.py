@@ -1,6 +1,7 @@
 import pytest
 
 from analyzer import camelot
+from quick_mixer import resumen_transiciones
 from set_planner import compatibles, objetivo_nivel
 
 
@@ -22,3 +23,7 @@ def test_harmonic_compatibility(left, right, expected):
 
 def test_energy_curve_handles_three_tracks():
     assert objetivo_nivel(0, 3, 0.6) == 3.0
+
+
+def test_single_track_set_has_no_transitions():
+    assert resumen_transiciones([], 4) == "1 segmento, sin transiciones."

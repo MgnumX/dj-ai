@@ -173,6 +173,14 @@ def micro_fades(y, sr, al_inicio=True):
     return y
 
 
+def resumen_transiciones(infos, beats):
+    if not infos:
+        return "1 segmento, sin transiciones."
+    return (f"{len(infos)} transiciones ({beats} beats) | "
+            f"rates: {min(i['rate'] for i in infos):.3f}-{max(i['rate'] for i in infos):.3f} "
+            f"| cruces: {min(i['cruce_s'] for i in infos):.1f}-{max(i['cruce_s'] for i in infos):.1f} s")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Mix rápido festival sobre segmentos")
     parser.add_argument("--cache", default="cache", help="carpeta con setlist/segments")
@@ -256,9 +264,7 @@ def main():
         sf.write(salida, mix.T, sr,
                  format="FLAC" if args.format == "flac" else "WAV")
 
-    print(f"\n{len(infos)} transiciones ({args.beats} beats) | "
-          f"rates: {min(i['rate'] for i in infos):.3f}-{max(i['rate'] for i in infos):.3f} "
-          f"| cruces: {min(i['cruce_s'] for i in infos):.1f}-{max(i['cruce_s'] for i in infos):.1f} s")
+    print(f"\n{resumen_transiciones(infos, args.beats)}")
     duracion = mix.shape[1] / sr
     print(f"Salida: {salida} ({duracion / 60:.1f} min, sr {sr})")
 
