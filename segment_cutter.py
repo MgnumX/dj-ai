@@ -28,6 +28,8 @@ import numpy as np
 import soundfile as sf
 from tqdm import tqdm
 
+from analyzer import escribir_json_atomico
+
 SEG_MIN = 60.0  # bajo este largo el segmento se usa completo con warning
 
 # Build-up (downbeats = barras) según rol: 4/2/1 barras antes del drop.
@@ -158,8 +160,7 @@ def main():
             tqdm.write(f"  ! Saltando {path.name}: {e}")
 
     out = cache_dir / "segments.json"
-    out.write_text(json.dumps({"segments": resultado, "warnings": warnings},
-                              ensure_ascii=False, indent=2))
+    escribir_json_atomico(out, {"segments": resultado, "warnings": warnings})
 
     print(f"\n{len(resultado)} segmentos en {seg_dir} -> {out}")
     print(f"{'Canción':<34} {'dur':>6} {'drop@':>7} {'rol':>9}")

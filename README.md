@@ -50,6 +50,8 @@ Salida capturada del planificador con metadatos sintéticos de prueba (sin archi
 
 El pipeline funciona de punta a punta con WAV sintéticos y tests offline. La mezcla todavía no se probó con audio real, así que los niveles y las transiciones pueden necesitar ajuste. No exporta a rekordbox, Serato ni otros formatos de biblioteca.
 
+El caché se reutiliza solo si el archivo conserva tamaño y fecha de modificación; si el audio cambia, se vuelve a analizar.
+
 ## Tests
 
 ```bash

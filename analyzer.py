@@ -28,7 +28,7 @@ from tqdm import tqdm
 
 HOP = 512            # frames de audio entre ventanas de análisis
 SR_ANALISIS = 22050  # resample para acelerar el análisis (BPM/key no cambian)
-VERSION_CACHE = 6    # bump al cambiar el schema de analysis.json
+VERSION_CACHE = 7    # bump al cambiar el schema de analysis.json
 
 # Perfiles de Krumhansl-Schmuckler (croma de una tonalidad típica) para
 # estimar la key por correlación sobre las 12 rotaciones de cada modo.
@@ -384,6 +384,19 @@ def cargar_cache(cache_path):
     return {"version": VERSION_CACHE, "songs": {}, "warnings": []}
 
 
+def cache_vigente(entrada, st):
+    """El caché sirve solo si el archivo no cambió de tamaño ni de mtime."""
+    return (entrada.get("file_size") == st.st_size
+            and entrada.get("file_mtime_ns") == st.st_mtime_ns)
+
+
+def escribir_json_atomico(path, data):
+    """Escribe a .tmp y reemplaza: un corte a mitad no deja JSON roto."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+    os.replace(tmp, path)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Analiza canciones para DJ (BPM, key, energía)")
     parser.add_argument("--songs", default="songs", help="carpeta con los MP3/FLAC")
@@ -421,16 +434,19 @@ def main():
 
     for path in tqdm(archivos, desc="Analizando canciones", unit="track"):
         clave = path.name
-        if clave in data["songs"]:
-            continue  # ya analizada y cacheada
-
         try:
-            data["songs"][clave] = analizar_archivo(path, genres)
+            st = path.stat()
+            if clave in data["songs"] and cache_vigente(data["songs"][clave], st):
+                continue  # ya analizada y sin cambios
+            entrada = analizar_archivo(path, genres)
+            entrada["file_size"] = st.st_size
+            entrada["file_mtime_ns"] = st.st_mtime_ns
+            data["songs"][clave] = entrada
         except Exception as e:  # archivo corrupto o ilegible
             data["warnings"].append({"file": path.name, "error": str(e)})
             tqdm.write(f"  ! Saltando {path.name}: {e}")
 
-        cache_file.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+        escribir_json_atomico(cache_file, data)
 
     # Resumen
     validas = data["songs"]

@@ -1,6 +1,8 @@
+import os
+
 import pytest
 
-from analyzer import camelot
+from analyzer import cache_vigente, camelot
 from quick_mixer import resumen_transiciones
 from set_planner import compatibles, objetivo_nivel
 
@@ -27,3 +29,17 @@ def test_energy_curve_handles_three_tracks():
 
 def test_single_track_set_has_no_transitions():
     assert resumen_transiciones([], 4) == "1 segmento, sin transiciones."
+
+
+def test_cache_vigente_por_tamano_y_mtime(tmp_path):
+    audio = tmp_path / "track.wav"
+    audio.write_bytes(b"1234")
+    st = audio.stat()
+    entrada = {"file_size": st.st_size, "file_mtime_ns": st.st_mtime_ns}
+    assert cache_vigente(entrada, st)
+
+    os.utime(audio, ns=(st.st_atime_ns, st.st_mtime_ns + 1_000_000))
+    assert not cache_vigente(entrada, audio.stat())
+
+    audio.write_bytes(b"12345")
+    assert not cache_vigente(entrada, audio.stat())
